@@ -8,6 +8,7 @@ use App\Http\Controllers\PosController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController; 
 
+
 Route::get('/login', [LoginController::class, 'create'])
     ->middleware('guest')
     ->name('login');
@@ -32,6 +33,7 @@ Route::middleware(['auth', 'role:admin,kasir'])->group(function () {
     Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
     Route::post('/pos', [PosController::class, 'store'])->name('pos.store');
 });
+
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('categories', CategoryController::class);
