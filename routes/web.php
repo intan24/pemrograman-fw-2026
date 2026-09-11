@@ -6,6 +6,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\PosController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController; 
 
 Route::get('/login', [LoginController::class, 'create'])
     ->middleware('guest')
@@ -30,4 +31,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 Route::middleware(['auth', 'role:admin,kasir'])->group(function () {
     Route::get('/pos', [PosController::class, 'index'])->name('pos.index');
     Route::post('/pos', [PosController::class, 'store'])->name('pos.store');
+});
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::resource('categories', CategoryController::class);
+    Route::resource('products', ProductController::class);
+    Route::get('/reports/sales', [ReportController::class, 'sales'])->name('report.sales');
+    
+   
+    Route::resource('users', UserController::class);
 });
