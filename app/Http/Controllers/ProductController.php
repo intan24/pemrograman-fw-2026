@@ -3,30 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    // GET /products/create -> menampilkan form tambah produk
     public function create()
     {
-        return view('products.create');
+        // Ambil data kategori jika form tambah produk membutuhkan pilihan kategori
+        $categories = Category::orderBy('name')->get();
+        return view('products.create', compact('categories'));
+    }
+    
+    public function index()
+    {
+        $products = Product::with('category')->latest()->paginate(10);
+    
+        return view('master-data.product.index', compact('products'));
     }
 
-    // POST /products -> memproses input form produk
- public function store(Request $request)
-{
-    $validated = $request->validate([
-        'name'  => 'required|string|max:255',
-        'price' => 'required|numeric|min:0',
-        'stock' => 'required|integer|min:0',
-    ]);
 
-    $product = Product::create($validated); // ← tambahan: simpan beneran ke DB
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name'  => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+        ]);
 
-    return response()->json([
-        'message' => 'Data berhasil disimpan!',
-        'data'    => $product
-    ]);
-}
+        Product::create($validated);
+
+        return redirect()->route('products.index')->with('success', 'Produk berhasil ditambahkan.');
+    }
 }
