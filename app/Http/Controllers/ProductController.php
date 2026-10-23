@@ -4,35 +4,57 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+    public function index(Request $request)
+    {
+        $query = Product::with('category');
+     
+        if ($request->filled('search')) {
+            $keyword = $request->search;
+            $query->where(function ($q) use ($keyword) {
+                $q->where('name', 'like', "%{$keyword}%")
+                  ->orWhere('code', 'like', "%{$keyword}%");
+            });
+        }
+     
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+     
+        $products = $query->latest()->paginate(10)->withQueryString();
+        $categories = Category::orderBy('name')->get();
+     
+        return view('master-data.product.index', compact('products', 'categories'));
+    }
+
     public function create()
     {
-        // Ambil data kategori jika form tambah produk membutuhkan pilihan kategori
         $categories = Category::orderBy('name')->get();
-        return view('products.create', compact('categories'));
-    }
-    
-    public function index()
-    {
-        $products = Product::with('category')->latest()->paginate(10);
-    
-        return view('master-data.product.index', compact('products'));
+        return view('master-data.product.create', compact('categories'));
     }
 
-
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
-        $validated = $request->validate([
-            'name'  => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-        ]);
-
-        Product::create($validated);
+        Product::create($request->validated());
 
         return redirect()->route('products.index')->with('success', 'Produk berhasil ditambahkan.');
+    }
+
+    public function edit(Product $product)
+    {
+        $categories = Category::orderBy('name')->get();
+        return view('master-data.product.edit', compact('product', 'categories'));
+    }
+
+    public function destroy(Product $product)
+    {
+        $product->delete();
+    
+        return redirect()->route('products.index')->with('success', 'Produk berhasil dihapus.');
     }
 }

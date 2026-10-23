@@ -9,6 +9,10 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/', function () {
+    return redirect('/login');
+});
+
 // Guest Routes
 Route::get('/login', [LoginController::class, 'create'])
     ->middleware('guest')
@@ -32,8 +36,8 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('products', ProductController::class);
-    Route::get('/reports/sales', [ReportController::class, 'sales'])->name('report.sales');
     Route::resource('users', UserController::class);
+    Route::get('/reports/sales', [ReportController::class, 'sales'])->name('report.sales');
 });
 
 // Route Khusus Kasir
@@ -49,4 +53,3 @@ Route::middleware(['auth', 'role:admin,kasir'])->group(function () {
     Route::post('/pos', [PosController::class, 'store'])->name('pos.store');
 });
 
-Route::resource('categories', CategoryController::class);

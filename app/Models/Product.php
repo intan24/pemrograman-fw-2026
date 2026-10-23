@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Product extends Model
 {
-    protected $fillable = ['category_id', 'code', 'name', 'unit', 'price', 'stock'];
+    protected $fillable = [
+    'category_id', 'code', 'name', 'unit', 'price', 'stock', 'image',
+];
 
     // --- ACCESSOR TAMBAHAN ---
     // Dipanggil lewat $product->formatted_price

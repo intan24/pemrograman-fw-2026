@@ -32,5 +32,4 @@ public function store(Request $request)
     return redirect()->route('categories.index')->with('success', 'Kategori berhasil ditambahkan.');
 }
 
-
 }
