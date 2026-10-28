@@ -52,6 +52,15 @@ class ProductController extends Controller
         return view('master-data.product.edit', compact('product', 'categories'));
     }
 
+    
+    public function update(UpdateProductRequest $request, Product $product)
+    {
+        $product->update($request->validated());
+    
+        return redirect()->route('products.index')->with('success', 'Produk berhasil diperbarui.');
+    }
+
+
     public function destroy(Product $product)
     {
         $product->delete();
